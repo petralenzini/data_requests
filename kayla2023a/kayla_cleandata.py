@@ -28,7 +28,7 @@ print("Single episode probable MDD:")
 bsub['SEPMDD']=0
 bsub.loc[((bsub.x4598_2_0 == 1) & (bsub.x4609_2_0 >= 2) & (bsub.x4620_2_0 == 1) & ((bsub.x2090_2_0 ==1) | (bsub.x2100_2_0 == 1)))
          |
-         ((bsub.x4631_2_0 ==1) & (bsub.x5375_2_0 >=2) & (bsub.x5386_2_0 ==1) & ((bsub.x2090_2_0 ==1) | (bsub.x2100_2_0==1))),'SEPMOD']=1
+         ((bsub.x4631_2_0 ==1) & (bsub.x5375_2_0 >=2) & (bsub.x5386_2_0 ==1) & ((bsub.x2090_2_0 ==1) | (bsub.x2100_2_0==1))),'SEPMDD']=1
 print(bsub.SEPMDD.value_counts())
 
 print("Reccurent moderate probable MDD:")
@@ -44,4 +44,19 @@ bsub.loc[((bsub.x4598_2_0 == 1) | (bsub.x4631_2_0 == 1)) &
          (bsub.x2100_2_0 == 1),"RSPMDD"]=1
 print(bsub.RSPMDD.value_counts())
 
+groups=['control', 'SEPMDD', 'RMPMDD', 'RSPMDD']
 
+pd.crosstab(bsub.SEPMDD, columns=bsub.RMPMDD)
+pd.crosstab(bsub.SEPMDD, columns=bsub.RSPMDD)
+pd.crosstab(bsub.RMPMDD, columns=bsub.RSPMDD)
+
+#separate categories
+
+bsub2=bsub.copy()
+bsub2.loc[bsub2.RSPMDD==1,'RMPMDD']=0
+bsub2.loc[bsub2.RSPMDD==1,'SEPMDD']=0
+bsub2.loc[bsub2.RMPMDD==1,'SEPMDD']=0
+
+pd.crosstab(bsub2.SEPMDD, columns=bsub2.RMPMDD)
+pd.crosstab(bsub2.SEPMDD, columns=bsub2.RSPMDD)
+pd.crosstab(bsub2.RMPMDD, columns=bsub2.RSPMDD)
