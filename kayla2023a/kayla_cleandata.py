@@ -24,7 +24,8 @@ bsub=bsub.drop_duplicates(subset='eid').copy()
 
 #THIS IS WHERE YOU WOULD WANT TO DROP ANY SUBJECT IN THE LIST ATTACHED TO THE GENERAL CHANNEL
 
-#busb=bsub.loc[~(bsub.eid.isin(yourlistofsubjects))]
+#bsub=bsub.loc[~(bsub.eid.isin(yourlistofsubjects))]
+#bsub.to_csv("pathtowhereveryouwanttosavethisfile.csv",index=False)
 ################
 
 print("final count:",bsub.shape[0])
