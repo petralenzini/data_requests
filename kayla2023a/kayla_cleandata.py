@@ -2,6 +2,7 @@ import pandas as pd
 pd.set_option('display.width', 400)
 pd.set_option('display.max_columns', 14)
 
+outdir='/Users/petralenzini/work/datarequests/kayla2023a/'
 #These two files should be reachable by you via /home/plenzini/ on the chpc.  Let me know if you can't find them.
 a=pd.read_csv('/Users/petralenzini/chpc3/datarequests/kayla/Vars19April24_ses-01.csv')
 v=pd.read_csv('/Users/petralenzini/chpc3/datarequests/kayla/varlist19April23_ses-01_revised.txt',header=None)
@@ -22,10 +23,13 @@ for i in keeplist:
     print(i,":",bsub.shape[0])
 bsub=bsub.drop_duplicates(subset='eid').copy()
 
-#THIS IS WHERE YOU WOULD WANT TO DROP ANY SUBJECT IN THE LIST ATTACHED TO THE GENERAL CHANNEL
 
-#bsub=bsub.loc[~(bsub.eid.isin(yourlistofsubjects))]
-#bsub.to_csv("pathtowhereveryouwanttosavethisfile.csv",index=False)
+
+#THIS IS WHERE YOU WOULD WANT TO DROP ANY SUBJECT IN THE LIST ATTACHED TO THE GENERAL CHANNEL
+withdrawns="/Users/petralenzini/work/McDonnell/datas/w47267_2023-04-25.csv"
+wd=list(pd.read_csv(withdrawns,header=None)[0])
+bsub=bsub.loc[~(bsub.eid.isin(wd))]
+bsub.to_csv(outdir+"AllSubjectsCovariates4KaylaLuca_30May2023.csv",index=False)
 ################
 
 print("final count:",bsub.shape[0])
@@ -36,6 +40,7 @@ print("control:")
 bsub['control']=0
 bsub.loc[(bsub.x2090_2_0 == 0) & (bsub.x2100_2_0 == 0) & (bsub.x4598_2_0 == 0) & (bsub.x4631_2_0 == 0),'control']=1
 print(bsub.control.value_counts())
+bsub.loc[bsub.control==1][['eid']].to_csv(outdir+'Controls.csv',index=False)
 
 ############################################################################
 
@@ -62,6 +67,7 @@ print(bsub.RMPMDD.value_counts())
 
 bsub['RMD']=0
 bsub['RMA']=0
+
 bsub.loc[((bsub.x4598_2_0 == 1) & (bsub.x4609_2_0 >= 2) & (bsub.x4620_2_0 >=2) & (bsub.x2090_2_0 == 1) & (bsub.x2100_2_0 == 0)),"RMD"]=1
 bsub.loc[((bsub.x4631_2_0 == 1) & (bsub.x5375_2_0 >= 2) & (bsub.x5386_2_0 >=2) & (bsub.x2090_2_0 == 1) & (bsub.x2100_2_0 == 0)),'RMA']=1
 
@@ -87,15 +93,20 @@ print(bsub.SA.value_counts())
 print(bsub.RMPMDD.value_counts())
 print(bsub.RMD.value_counts())
 print(bsub.RMA.value_counts())
+print("RMA AND RMD CROSSTAB",pd.crosstab(bsub.RMA, columns=bsub.RMD))
 
 print(bsub.RSPMDD.value_counts())
 print(bsub.RSD.value_counts())
 print(bsub.RSA.value_counts())
+print("RSD AND RSA CROSSTAB",pd.crosstab(bsub.RSD, columns=bsub.RSA))
+
+#RSMDD and RMPMDD together
+bsub.loc[(bsub.RSPMDD==1) | (bsub.RMPMDD==1)][['eid']].to_csv(outdir+"ModerateOrSevere.csv",index=False)
+
 
 #QCS
 print("SEPMDD AND RMPMDD CROSSTAB",pd.crosstab(bsub.SEPMDD, columns=bsub.RMPMDD))
 print("SEPMDD AND RSPMDD CROSSTAB",pd.crosstab(bsub.SEPMDD, columns=bsub.RSPMDD))
-
 pd.crosstab(bsub.RMPMDD, columns=bsub.RSPMDD)
 
 c=['x2090_2_0', 'x2100_2_0', 'x4598_2_0', 'x4609_2_0', 'x4620_2_0', 'x4631_2_0', 'x5375_2_0', 'x5386_2_0','control', 'SD','SA','RMD','RMA','RSA','RSD','SEPMDD', 'RMPMDD', 'RSPMDD']
