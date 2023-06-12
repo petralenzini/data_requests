@@ -7,6 +7,7 @@ outdir='/Users/petralenzini/work/datarequests/kayla2023a/'
 a=pd.read_csv('/Users/petralenzini/chpc3/datarequests/kayla/Vars19April24_ses-01.csv')
 v=pd.read_csv('/Users/petralenzini/chpc3/datarequests/kayla/varlist19April23_ses-01_revised.txt',header=None)
 
+#just changing some variable names
 kvars = [w.replace('-', '_') for w in list(v[0])]
 kvars2 = ["x"+w.replace('.', '_') for w in kvars]
 varlist=['eid']+kvars2
@@ -16,6 +17,7 @@ a1=varlist[1:13]
 a2=['x20532_0_0', 'x4631_2_0', 'x20446_0_0', 'x4598_2_0','x21003_2_0']
 keeplist=a1+a2
 
+#remove missing values.  You'll want to extend this to isna() and negatives
 bsub=a.copy()
 print('orig count:',bsub.shape[0])
 for i in keeplist:
@@ -26,6 +28,7 @@ bsub=bsub.drop_duplicates(subset='eid').copy()
 
 
 #THIS IS WHERE YOU WOULD WANT TO DROP ANY SUBJECT IN THE LIST ATTACHED TO THE GENERAL CHANNEL
+#actually nevermind.  There aren't any people who withdrew in our sample.
 withdrawns="/Users/petralenzini/work/McDonnell/datas/w47267_2023-04-25.csv"
 wd=list(pd.read_csv(withdrawns,header=None)[0])
 bsub=bsub.loc[~(bsub.eid.isin(wd))]
