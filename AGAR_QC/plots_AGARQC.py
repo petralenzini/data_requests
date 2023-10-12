@@ -4,6 +4,10 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 
+rootdir="/Users/petralenzini/work/datarequests/AGAR_QC/"
+infile="AGAR_QC_2023.10.11.PL_PREPPED.csv"
+figsout=rootdir+"pngs/"
+
 QCver='ABCD_QA'
 QCver='FBIRN_QA'
 if QCver =='FBIRN_QA':
@@ -11,9 +15,7 @@ if QCver =='FBIRN_QA':
 else:
     isFBIRNQA=0
 
-figsout="/Users/petralenzini/work/datarequests/AGAR_QC/pngs/"
-AGARQCAll=pd.read_csv("/Users/petralenzini/work/datarequests/AGAR_QC/AGAR_QC_2023.10.11.PL_PREPPED.csv")
-
+AGARQCAll=pd.read_csv(rootdir+infile)
 
 #not sure what this is doing:
 AGARQC=AGARQCAll.loc[(AGARQCAll.SeriesDesc.str.contains(QCver)) & (~(AGARQCAll.SeriesDesc.str.contains("flip10")))]
@@ -54,6 +56,7 @@ def plot6(df=AGARQCnodup,varlist=['meanfwhmx','meanfwhmy','meanfwhmz'],yax=(),yt
     plt.show()
 #Can we add small circle markers to each data point in the plots?
 
+#tweak plots with yax (axis range), ytick (where you want ticks), ylab (labels for ticks)
 plot6(varlist=['SNR'], ytick=[400, 800, 1200],ylab=[])
 plot6(varlist=['tSNR'],yax=(0, 1000), ytick=[250, 500,750],ylab=[])
 plot6(varlist=['mean'],yax=(0, 2000), ytick=[500,1000,1500],ylab=[])
@@ -66,4 +69,4 @@ plot6(varlist=['BIRN_HUMAN_SFNR','BIRN_HUMAN_SNR'])#,yax=(0, 10000000))
 plot6(varlist=['meanfwhmx','meanfwhmy','meanfwhmz'])
 
 #write out the observations with high BIRN_HUMAN_SFNR
-AGARQCnodup.loc[AGARQCnodup.BIRN_HUMAN_SFNR > 1e6][['Date','Coil','Scanner','SeriesDesc','BIRN_HUMAN_SFNR']].to_csv('High_BIRN_HUMAN_SFNR.csv',index=False)
+AGARQCnodup.loc[AGARQCnodup.BIRN_HUMAN_SFNR > 1e6][['Date','Coil','Scanner','SeriesDesc','BIRN_HUMAN_SFNR']].to_csv(rootdir+'High_BIRN_HUMAN_SFNR.csv',index=False)

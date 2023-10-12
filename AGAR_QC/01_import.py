@@ -1,8 +1,11 @@
 import pandas as pd
 
+rootdir="/Users/petralenzini/work/datarequests/AGAR_QC/"
 #read the data into a pandas dataframe
-csvfile="/Users/petralenzini/work/datarequests/AGAR_QC/AGAR_QC_2023.10.02.csv";
-AGARQC=pd.read_csv(csvfile)
+csvfile="AGAR_QC_2023.10.02.csv";
+outfile="AGAR_QC_2023.10.11.PL_PREPPED.csv"
+
+AGARQC=pd.read_csv(rootdir+csvfile)
 AGARQC=AGARQC.drop(columns=['Subject'])#Default 'Subject' variable is in form of IntraDB UID;
 
 #rename some columns
@@ -55,7 +58,7 @@ AGARQC['DateDec']=AGARQC.Date.dt.year + (AGARQC.Date.dt.dayofyear -1)/365
 
 # At this point we should have the data prepped
 AGARQCAll=AGARQC.sort_values(by=['Date','Coil','Scanner','ScanId'])
-AGARQCAll.to_csv("/Users/petralenzini/work/datarequests/AGAR_QC/AGAR_QC_2023.10.11.PL_PREPPED.csv",index=False)
+AGARQCAll.to_csv(rootdir+outfile,index=False)
 
 
 
