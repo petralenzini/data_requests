@@ -11,10 +11,9 @@ if QCver =='FBIRN_QA':
 else:
     isFBIRNQA=0
 
-figsout="/Users/petralenzini/work/datarequests/MikeHarms/AABC_Agar_2023/AGAR_QC/pngs/"
-AGARQCAll=pd.read_csv("AGAR_QC_2023.10.02.PL_PREPPED.csv")
-#AGARQCAll['Date'] = pd.to_datetime(AGARQCAll['Date'])
-#AGARQC=AGARQCAll.loc[AGARQCAll.Date>'2014-05-01']
+figsout="/Users/petralenzini/work/datarequests/AGAR_QC/pngs/"
+AGARQCAll=pd.read_csv("/Users/petralenzini/work/datarequests/AGAR_QC/AGAR_QC_2023.10.11.PL_PREPPED.csv")
+
 
 #not sure what this is doing:
 AGARQC=AGARQCAll.loc[(AGARQCAll.SeriesDesc.str.contains(QCver)) & (~(AGARQCAll.SeriesDesc.str.contains("flip10")))]
@@ -24,33 +23,46 @@ AGARQC=AGARQC.loc[~(AGARQC.Coil.str.contains("Cere32B"))].copy()
 
 AGARQCnodup=AGARQC.drop_duplicates(subset=['SeriesDesc','Date','Coil','ScannerPerMRID']).copy()
 varlist=['SNR']
-def plot6(varlist=['meanfwhmx','meanfwhmy','meanfwhmz']):
-    melted=pd.melt(AGARQCnodup,id_vars=['Date','Coil','ScannerPerMRID'],value_vars=varlist)
+def plot6(df=AGARQCnodup,varlist=['meanfwhmx','meanfwhmy','meanfwhmz'],yax=(),ytick=[],ylab=[]):
+    melted=pd.melt(df,id_vars=['DateDec','Coil','ScannerPerMRID'],value_vars=varlist)
     with sns.axes_style("white"):
         g = sns.FacetGrid(melted, row="Coil", col="ScannerPerMRID", margin_titles=True, height=2.5)
-    g.map(sns.lineplot, 'Date', 'value',markersize=.25,hue=melted.variable)
-    #g.set(yticks=np.arange(4,20,2))
-    labelsx=['2016','2018','2020','2022']
-    xrange=np.arange(42740,44932,730)
+    #manipulate marker sizes here.  note that hue is necessary for overlays
+    g.map(sns.scatterplot, 'DateDec', 'value',hue=melted.variable,s=20)#,facecolor=None)
+    g.map(sns.lineplot, 'DateDec', 'value',markersize=.01, hue=melted.variable)
+    labelsx=['2019','2021','2023']
+    xrange=np.array([2019,2021,2023])
     g.set(xticks=xrange)
     g.set_xticklabels(labelsx)
+    if len(varlist)==1:
+        g.set_ylabels(varlist[0])
+    if len(varlist)>1:
+        g.set_ylabels("")
+    if len(yax)>0:
+        g.set(ylim=yax)
+    if len(ytick)>0:
+        yrange = np.array(ytick)
+        g.set(yticks=yrange)
+    if len(ylab) > 0 and len(ylab) == len(ytick):
+        labelsy = ylab
+        g.set_yticklabels(labelsy)
+    if len(varlist)>1:
+        g.add_legend()
     g.figure.subplots_adjust(wspace=.02, hspace=.02)
     v4title = str(varlist).replace("[", "").replace("]", "").replace(",", "_").replace(" ", "").replace("'", "")
     plt.savefig(figsout+v4title)
-    #g.legend()
-    #g.add_legend()
     plt.show()
+#Can we add small circle markers to each data point in the plots?
 
-plot6(varlist=['SNR'])
-
-plot6(varlist=['tSNR'])
-plot6(varlist=['mean'])
+plot6(varlist=['SNR'], ytick=[400, 800, 1200],ylab=[])
+plot6(varlist=['tSNR'],yax=(0, 1000), ytick=[250, 500,750],ylab=[])
+plot6(varlist=['mean'],yax=(0, 2000), ytick=[500,1000,1500],ylab=[])
 plot6(varlist=['std'])
-plot6(varlist=['PercentFluctuation'])
+plot6(varlist=['PercentFluctuation'],yax=(0, .2))
 plot6(varlist=['Drift','driftfit'])
 plot6(varlist=['rdc'])
 plot6(varlist=['meanghost','meanbrightghost'])
-plot6(varlist=['BIRN_HUMAN_SFNR','BIRN_HUMAN_SNR'])
+plot6(varlist=['BIRN_HUMAN_SFNR','BIRN_HUMAN_SNR'])#,yax=(0, 10000000))
 plot6(varlist=['meanfwhmx','meanfwhmy','meanfwhmz'])
 
 #write out the observations with high BIRN_HUMAN_SFNR
