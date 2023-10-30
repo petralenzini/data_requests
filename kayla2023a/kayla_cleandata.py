@@ -22,7 +22,12 @@ bsub=a.copy()
 print('orig count:',bsub.shape[0])
 for i in keeplist:
     bsub=bsub.loc[bsub[i].isnull()==False]
+    bsub = bsub.loc[bsub[i].isna()==False]
+    bsub = bsub.loc[~(bsub[i]=='')]
     print(i,":",bsub.shape[0])
+
+bsub.shape
+
 bsub=bsub.drop_duplicates(subset='eid').copy()
 
 
